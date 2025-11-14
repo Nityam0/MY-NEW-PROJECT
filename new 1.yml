@@ -1,12 +1,42 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: S3 bucket demo
+Description: Combined EC2 + S3 demo
 
 Resources:
+ 
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH & HTTP
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+ 
   MyS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: nityam-demo-bucket-12345   # Must be globally unique
+      BucketName: nityam-combined-demo-bucket-12345   # Must be globally unique
       AccessControl: Private
       Tags:
         - Key: Name
           Value: NITYAM-S3
+
+ 
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:ami-02b8269d5e85954ef
+      InstanceType: t3.micro
+      KeyName: CLOUD
+      SecurityGroupIds:
+        - !GetAtt MySecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: NITYAM-SIR
+
